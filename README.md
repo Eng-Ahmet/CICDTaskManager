@@ -59,13 +59,13 @@ This repository includes three approaches to CI/CD with GitHub Actions:
 
 ### Status badges (one workflow per stage)
 
-> Replace `YOUR_GITHUB_USERNAME/YOUR_REPO_NAME` with your own GitHub username and repository name.
+> Replace `Eng-Ahmet/CICDTaskManager` with your own GitHub username and repository name.
 
-![Compile](https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/actions/workflows/compile.yml/badge.svg?branch=main)
-![Test](https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/actions/workflows/test.yml/badge.svg?branch=main)
-![Build](https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/actions/workflows/build.yml/badge.svg?branch=main)
-![Integration Test](https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/actions/workflows/integration-test.yml/badge.svg?branch=main)
-![Javadoc](https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/actions/workflows/javadoc.yml/badge.svg?branch=main)
+![Compile](https://github.com/Eng-Ahmet/CICDTaskManager/actions/workflows/compile.yml/badge.svg?branch=main)
+![Test](https://github.com/Eng-Ahmet/CICDTaskManager/actions/workflows/test.yml/badge.svg?branch=main)
+![Build](https://github.com/Eng-Ahmet/CICDTaskManager/actions/workflows/build.yml/badge.svg?branch=main)
+![Integration Test](https://github.com/Eng-Ahmet/CICDTaskManager/actions/workflows/integration-test.yml/badge.svg?branch=main)
+![Javadoc](https://github.com/Eng-Ahmet/CICDTaskManager/actions/workflows/javadoc.yml/badge.svg?branch=main)
 
 ## How to build and test
 

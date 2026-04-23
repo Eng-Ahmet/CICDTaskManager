@@ -8,6 +8,7 @@ import org.iips.actions.service.TaskService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @DisplayName("TaskService Integration Tests (Top-Down, Mockito)")
+@ExtendWith(MockitoExtension.class)
 class TaskServiceIT {
   @Mock TaskRepository repository;
 
