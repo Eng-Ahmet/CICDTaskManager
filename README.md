@@ -80,7 +80,7 @@ mvn test
 mvn package
 
 # Run integration tests
-mvn integration-test
+mvn verify
 
 # Generate coverage report (opt-in)
 mvn test -P coverage
