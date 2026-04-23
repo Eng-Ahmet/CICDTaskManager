@@ -3,29 +3,30 @@ package org.iips.actions.integration;
 import org.iips.actions.exception.InvalidTaskException;
 import org.iips.actions.exception.TaskNotFoundException;
 import org.iips.actions.model.Task;
+import org.iips.actions.repository.InMemoryTaskRepository;
 import org.iips.actions.repository.TaskRepository;
 import org.iips.actions.service.TaskService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @DisplayName("TaskService Integration Tests (Top-Down, Mockito)")
-@ExtendWith(MockitoExtension.class)
 class TaskServiceIT {
-  @Mock TaskRepository repository;
+  TaskRepository repository;
 
-  @InjectMocks TaskService service;
+  TaskService service;
+
+  @BeforeEach
+  void setUp() {
+    repository = new InMemoryTaskRepository();
+    service = new TaskService(repository);
+  }
 
   @Nested
   @DisplayName("Create Task")
@@ -33,18 +34,20 @@ class TaskServiceIT {
     @Test
     @DisplayName("Should delegate to repository and return saved task")
     void shouldDelegateCreateTask() {
-      Task mockTask = new Task(UUID.randomUUID(), "Integration", false, LocalDate.now());
-      when(repository.save(any(Task.class))).thenReturn(mockTask);
-      Task result = service.createTask("Integration", LocalDate.now());
-      assertEquals(mockTask.description(), result.description());
-      verify(repository).save(any(Task.class));
+      LocalDate dueDate = LocalDate.now();
+      Task result = service.createTask("Integration", dueDate);
+
+      assertEquals("Integration", result.description());
+      assertFalse(result.completed());
+      assertEquals(dueDate, result.dueDate());
+      assertEquals(result, repository.findById(result.id()).orElseThrow());
     }
 
     @Test
     @DisplayName("Should throw InvalidTaskException for blank description")
     void shouldThrowForBlankDescription() {
       assertThrows(InvalidTaskException.class, () -> service.createTask(" ", LocalDate.now()));
-      verify(repository, never()).save(any());
+      assertTrue(repository.findAll().isEmpty());
     }
   }
 
@@ -57,22 +60,21 @@ class TaskServiceIT {
       UUID id = UUID.randomUUID();
       Task existing = new Task(id, "Complete", false, null);
       Task completed = new Task(id, "Complete", true, null);
-      when(repository.findById(id)).thenReturn(Optional.of(existing));
-      when(repository.save(any(Task.class))).thenReturn(completed);
+
+      repository.save(existing);
       Task result = service.completeTask(id);
+
       assertTrue(result.completed());
-      verify(repository).findById(id);
-      verify(repository).save(any(Task.class));
+      assertEquals(completed, result);
+      assertEquals(completed, repository.findById(id).orElseThrow());
     }
 
     @Test
     @DisplayName("Should throw TaskNotFoundException if not found")
     void shouldThrowIfNotFound() {
       UUID id = UUID.randomUUID();
-      when(repository.findById(id)).thenReturn(Optional.empty());
       assertThrows(TaskNotFoundException.class, () -> service.completeTask(id));
-      verify(repository).findById(id);
-      verify(repository, never()).save(any());
+      assertTrue(repository.findById(id).isEmpty());
     }
   }
 
@@ -83,18 +85,18 @@ class TaskServiceIT {
     @DisplayName("Should delete task if found")
     void shouldDeleteTaskIfFound() {
       UUID id = UUID.randomUUID();
-      when(repository.deleteById(id)).thenReturn(true);
+
+      repository.save(new Task(id, "Delete", false, null));
       assertDoesNotThrow(() -> service.deleteTask(id));
-      verify(repository).deleteById(id);
+      assertTrue(repository.findById(id).isEmpty());
     }
 
     @Test
     @DisplayName("Should throw TaskNotFoundException if not found")
     void shouldThrowIfNotFound() {
       UUID id = UUID.randomUUID();
-      when(repository.deleteById(id)).thenReturn(false);
       assertThrows(TaskNotFoundException.class, () -> service.deleteTask(id));
-      verify(repository).deleteById(id);
+      assertTrue(repository.findById(id).isEmpty());
     }
   }
 
@@ -106,19 +108,19 @@ class TaskServiceIT {
     void shouldGetTaskIfFound() {
       UUID id = UUID.randomUUID();
       Task task = new Task(id, "Get", false, null);
-      when(repository.findById(id)).thenReturn(Optional.of(task));
+      repository.save(task);
       Task result = service.getTaskById(id);
+
       assertEquals(id, result.id());
-      verify(repository).findById(id);
+      assertEquals(task, result);
     }
 
     @Test
     @DisplayName("Should throw TaskNotFoundException if not found")
     void shouldThrowIfNotFound() {
       UUID id = UUID.randomUUID();
-      when(repository.findById(id)).thenReturn(Optional.empty());
       assertThrows(TaskNotFoundException.class, () -> service.getTaskById(id));
-      verify(repository).findById(id);
+      assertTrue(repository.findById(id).isEmpty());
     }
   }
 }
